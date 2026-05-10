@@ -9,13 +9,17 @@ import { slugSchema } from "@/lib/validators";
 interface Args { params: Promise<{ slug: string }>; }
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config });
-  const r = await payload.find({
-    collection: "projects",
-    where: { status: { equals: "published" } },
-    limit: 100,
-  });
-  return r.docs.map((p) => ({ slug: p.slug }));
+  try {
+    const payload = await getPayload({ config });
+    const r = await payload.find({
+      collection: "projects",
+      where: { status: { equals: "published" } },
+      limit: 100,
+    });
+    return r.docs.map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export const revalidate = 600;
@@ -75,7 +79,7 @@ export default async function ProjectDetail({ params }: Args) {
               <>
                 <h3 style={{ fontSize: 14, fontWeight: 700, margin: "32px 0 10px" }}># features</h3>
                 <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 14, lineHeight: 1.7 }}>
-                  {p.features.map((f, i) => (
+                  {p.features.map((f: { text: string }, i: number) => (
                     <li key={i}>
                       <span style={{ color: "var(--accent)", marginRight: 10, fontWeight: 800 }}>*</span>
                       {f.text}

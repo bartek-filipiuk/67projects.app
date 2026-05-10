@@ -14,7 +14,10 @@ describe("env", () => {
 
   it("throws if PAYLOAD_SECRET shorter than 32", async () => {
     process.env.PAYLOAD_SECRET = "too-short";
-    await expect(import("@/lib/env?case=short")).rejects.toThrow(/PAYLOAD_SECRET/);
+    vi.resetModules();
+    await expect(async () => {
+      await import("@/lib/env");
+    }).rejects.toThrow(/PAYLOAD_SECRET/);
     process.env.PAYLOAD_SECRET = "test-secret-32-bytes-aaaaaaaaaaaa";
   });
 });

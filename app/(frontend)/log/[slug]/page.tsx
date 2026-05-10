@@ -7,13 +7,17 @@ import { slugSchema } from "@/lib/validators";
 interface Args { params: Promise<{ slug: string }>; }
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config });
-  const r = await payload.find({
-    collection: "logEntries",
-    where: { published: { equals: true } },
-    limit: 200,
-  });
-  return r.docs.map((e) => ({ slug: e.slug }));
+  try {
+    const payload = await getPayload({ config });
+    const r = await payload.find({
+      collection: "logEntries",
+      where: { published: { equals: true } },
+      limit: 200,
+    });
+    return r.docs.map((e) => ({ slug: e.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export const revalidate = 600;
