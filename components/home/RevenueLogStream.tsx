@@ -8,8 +8,11 @@ const MAX_LINES = 20;
 
 export function RevenueLogStream({ initial }: { initial: Sale[] }) {
   const [lines, setLines] = useState<Sale[]>(initial);
+  const [now, setNow] = useState<string | null>(null);
 
   useEffect(() => {
+    setNow(new Date().toTimeString().slice(0, 8));
+    const tick = setInterval(() => setNow(new Date().toTimeString().slice(0, 8)), 1000);
     const ev = new EventSource("/api/sales-stream");
     const handler = (e: MessageEvent) => {
       try {
@@ -21,6 +24,7 @@ export function RevenueLogStream({ initial }: { initial: Sale[] }) {
     };
     ev.addEventListener("sale", handler as EventListener);
     return () => {
+      clearInterval(tick);
       ev.removeEventListener("sale", handler as EventListener);
       ev.close();
     };
@@ -77,7 +81,9 @@ export function RevenueLogStream({ initial }: { initial: Sale[] }) {
             </div>
           ))}
           <div style={{ display: "flex", gap: 8, padding: "3px 0" }}>
-            <span style={{ color: "var(--dim)" }}>[{new Date().toTimeString().slice(0, 8)}]</span>
+            <span style={{ color: "var(--dim)" }} suppressHydrationWarning>
+              [{now ?? "--:--:--"}]
+            </span>
             <span style={{ color: "var(--accent)", fontWeight: 700 }}>Stripe:</span>
             <span>Listening for events…</span>
             <Cursor char="_" />

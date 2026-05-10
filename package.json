@@ -17,8 +17,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "seed": "tsx scripts/seed.ts",
-    "create-admin": "tsx scripts/create-admin.ts",
+    "seed": "tsx --env-file=.env scripts/seed.ts",
+    "create-admin": "tsx --env-file=.env scripts/create-admin.ts",
     "payload": "payload"
   },
   "dependencies": {
