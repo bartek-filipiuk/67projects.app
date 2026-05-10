@@ -4,7 +4,10 @@ node_modules
 tests
 playwright-report
 coverage
+.env
 .env.local
 .env.*.local
-README.md
+.coolify.env
+.security-audit
 docs
+screenshots

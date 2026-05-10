@@ -12,3 +12,5 @@ test-results
 media/
 !media/.gitkeep
 payload-types.ts
+.coolify.env
+.security-audit/
