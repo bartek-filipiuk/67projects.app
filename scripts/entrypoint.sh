@@ -30,8 +30,10 @@ function tryOnce() {
 EOF
 
 # Apply Payload migrations (idempotent — Payload tracks applied migrations in DB).
+# Use bin.js (not dist/bin/index.js directly) so tsx loader is set up
+# to read payload.config.ts at runtime.
 echo "[entrypoint] running payload migrations..."
-node node_modules/payload/dist/bin/index.js migrate
+./node_modules/.bin/payload migrate
 
 # Idempotent fresh-start seed (categories + clean SiteSettings on first run).
 if [ "${RUN_SEED_FRESH:-1}" = "1" ]; then
