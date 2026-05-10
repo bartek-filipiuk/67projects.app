@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 const ALLOWED = ["image/png", "image/jpeg", "image/webp", "image/avif"];
+const MAX_BYTES = 5 * 1024 * 1024;
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -23,8 +24,13 @@ export const Media: CollectionConfig = {
   hooks: {
     beforeChange: [
       ({ data, req }) => {
-        if (req.file && !ALLOWED.includes(req.file.mimetype)) {
-          throw new Error(`MIME type ${req.file.mimetype} not allowed`);
+        if (req.file) {
+          if (!ALLOWED.includes(req.file.mimetype)) {
+            throw new Error(`MIME type ${req.file.mimetype} not allowed`);
+          }
+          if (typeof req.file.size === "number" && req.file.size > MAX_BYTES) {
+            throw new Error(`File exceeds 5 MB limit`);
+          }
         }
         return data;
       },

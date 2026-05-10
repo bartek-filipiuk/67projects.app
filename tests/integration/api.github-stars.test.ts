@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { GET } from "@/app/api/github-stars/[owner]/[repo]/route";
+
+vi.mock("next/headers", () => ({
+  headers: () => Promise.resolve(new Headers()),
+}));
+
+const { GET } = await import("@/app/api/github-stars/[owner]/[repo]/route");
 
 describe("GET /api/github-stars", () => {
   beforeEach(() => vi.restoreAllMocks());

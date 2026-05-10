@@ -35,9 +35,10 @@
 - Drizzle (Payload internal) uses parameterized queries → SQL injection N/A
 
 ### Rate limiting (`lib/rate-limit.ts`)
-- `/api/contact` (Server Action): 5 requests / hour / IP, token bucket
-- `/api/github-stars/*`: 60 requests / minute / IP
-- 429 on exceeded with `Retry-After`
+- Contact form (Server Action `submitContact`): 5 requests / hour / IP, token bucket
+- `/api/github-stars/*`: 60 requests / minute / IP, token bucket
+- ContactSubmissions REST create: forbidden — `create: req.payloadAPI === 'local'` ensures only the Server Action (which enforces the rate limit) can create records
+- 429 with `Retry-After` header
 - In-memory LRU; ready to swap for Upstash Redis at scale
 
 ### GDPR
@@ -48,9 +49,11 @@
 - Right-to-delete: admin can purge ContactSubmissions
 
 ### Media uploads
-- MIME whitelist + magic-byte check (`Media.ts` beforeChange hook)
-- 5 MB max
+- Admin-only (auth gated)
+- MIME whitelist (`Media.ts` `upload.mimeTypes` + `beforeChange` re-check)
+- 5 MB hard size cap (`MAX_BYTES`)
 - SVG explicitly forbidden (XSS vector)
+- Magic-byte content check NOT implemented in MVP — admin-trust is the active control. Add `file-type` check in Phase 3 if media uploads open up to non-admin users.
 
 ### Dependency hygiene
 - `pnpm audit --prod` gate
