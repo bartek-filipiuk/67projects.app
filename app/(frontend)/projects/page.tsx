@@ -5,17 +5,34 @@ import { ProductFilter } from "@/components/product/ProductFilter";
 
 export const revalidate = 600;
 
-export default async function ProjectsPage() {
-  const payload = await getPayload({ config });
-  const result = await payload.find({
-    collection: "projects",
-    where: { status: { equals: "published" } },
-    sort: "-day",
-    limit: 100,
-    depth: 1,
-  });
+interface ProjectDoc {
+  slug: string;
+  name: string;
+  path: string;
+  priceCents: number;
+  currency: string;
+  description: string;
+  tag?: string | null;
+  category: string | { name?: string } | number;
+}
 
-  const products = result.docs.map((p) => ({
+export default async function ProjectsPage() {
+  let docs: ProjectDoc[] = [];
+  try {
+    const payload = await getPayload({ config });
+    const result = await payload.find({
+      collection: "projects",
+      where: { status: { equals: "published" } },
+      sort: "-day",
+      limit: 100,
+      depth: 1,
+    });
+    docs = result.docs as unknown as ProjectDoc[];
+  } catch {
+    /* DB unavailable */
+  }
+
+  const products = docs.map((p) => ({
     slug: p.slug,
     name: p.name,
     path: p.path,

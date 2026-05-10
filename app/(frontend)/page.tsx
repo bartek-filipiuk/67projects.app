@@ -12,23 +12,50 @@ import { getSiteSettings } from "@/lib/site-settings";
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const payload = await getPayload({ config });
   const s = await getSiteSettings();
 
-  const [latestProjects, repos] = await Promise.all([
-    payload.find({
-      collection: "projects",
-      where: { status: { equals: "published" } },
-      sort: "-day",
-      limit: 3,
-    }),
-    payload.find({
-      collection: "repos",
-      where: { published: { equals: true } },
-      sort: "-starsCached",
-      limit: 3,
-    }),
-  ]);
+  interface ProjectDoc {
+    slug: string;
+    name: string;
+    path: string;
+    priceCents: number;
+    currency: string;
+    description: string;
+    tag?: string | null;
+  }
+  interface RepoDoc {
+    name: string;
+    owner: string;
+    fullPath?: string | null;
+    description: string;
+    lang: string;
+    starsCached?: number | null;
+    license: string;
+  }
+
+  let latestProjects: { docs: ProjectDoc[] } = { docs: [] };
+  let repos: { docs: RepoDoc[] } = { docs: [] };
+  try {
+    const payload = await getPayload({ config });
+    const [pj, rp] = await Promise.all([
+      payload.find({
+        collection: "projects",
+        where: { status: { equals: "published" } },
+        sort: "-day",
+        limit: 3,
+      }),
+      payload.find({
+        collection: "repos",
+        where: { published: { equals: true } },
+        sort: "-starsCached",
+        limit: 3,
+      }),
+    ]);
+    latestProjects = { docs: pj.docs as unknown as ProjectDoc[] };
+    repos = { docs: rp.docs as unknown as RepoDoc[] };
+  } catch {
+    /* DB unavailable during build — render empty; ISR will re-query at runtime */
+  }
 
   return (
     <main style={{ padding: "0 0 80px" }}>

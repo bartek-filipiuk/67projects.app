@@ -5,14 +5,30 @@ import { RepoCard } from "@/components/repo/RepoCard";
 
 export const revalidate = 3600;
 
+interface RepoDoc {
+  name: string;
+  owner: string;
+  fullPath?: string | null;
+  description: string;
+  lang: string;
+  starsCached?: number | null;
+  license: string;
+}
+
 export default async function OpenSourcePage() {
-  const payload = await getPayload({ config });
-  const r = await payload.find({
-    collection: "repos",
-    where: { published: { equals: true } },
-    sort: "-starsCached",
-    limit: 50,
-  });
+  let docs: RepoDoc[] = [];
+  try {
+    const payload = await getPayload({ config });
+    const r = await payload.find({
+      collection: "repos",
+      where: { published: { equals: true } },
+      sort: "-starsCached",
+      limit: 50,
+    });
+    docs = r.docs as unknown as RepoDoc[];
+  } catch {
+    /* DB unavailable */
+  }
   return (
     <main style={{ padding: "0 0 80px" }}>
       <section style={{ padding: "56px 0 8px" }}>
@@ -25,10 +41,10 @@ export default async function OpenSourcePage() {
             paddingLeft: 18,
           }}
         >
-          200 OK · {r.docs.length} repos
+          200 OK · {docs.length} repos
         </div>
         <div className="grid-3">
-          {r.docs.map((p) => (
+          {docs.map((p) => (
             <RepoCard
               key={p.name}
               p={{
