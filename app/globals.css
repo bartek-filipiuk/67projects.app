@@ -9,8 +9,8 @@
   --color-dim: #5C5648;
   --color-border-strong: #000000;
 
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-mono-display: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: var(--font-jetbrains-mono, "JetBrains Mono"), "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono-display: var(--font-jetbrains-mono, "JetBrains Mono"), ui-monospace, monospace;
 }
 
 :root {

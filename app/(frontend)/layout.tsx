@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css";
+import { jetbrainsMono } from "@/styles/fonts";
 import { Nav } from "@/components/nav/Nav";
 import { Footer } from "@/components/footer/Footer";
 
@@ -11,10 +12,28 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={jetbrainsMono.variable}>
       <body>
-        <div style={{ minHeight: "100vh", maxWidth: 1440, margin: "0 auto", padding: "0 32px", borderLeft: "1px dashed var(--dim)", borderRight: "1px dashed var(--dim)" }}>
-          <div style={{ display: "flex", gap: 24, fontSize: 11, padding: "6px 0 4px", borderBottom: "1px dashed var(--dim)", color: "var(--dim)" }}>
+        <div
+          style={{
+            minHeight: "100vh",
+            maxWidth: 1440,
+            margin: "0 auto",
+            padding: "0 32px",
+            borderLeft: "1px dashed var(--dim)",
+            borderRight: "1px dashed var(--dim)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              gap: 24,
+              fontSize: 11,
+              padding: "6px 0 4px",
+              borderBottom: "1px dashed var(--dim)",
+              color: "var(--dim)",
+            }}
+          >
             <span>Loading 67projects.app v0.1.0…</span>
             <span>OK.</span>
           </div>
