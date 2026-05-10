@@ -3,13 +3,31 @@ import { Cursor } from "../primitives/Cursor";
 import { AsciiProgressBar } from "../primitives/AsciiProgressBar";
 
 interface HeroProps {
+  title: string;
+  subtitle: string;
   currentDay: number;
   total: number;
   totalRevenueCents: number;
   streak: number;
+  statusLabel: string;
+  mrrLabel: string;
+  primaryCta: { label: string; href: string };
+  secondaryCta: { label: string; href: string };
 }
 
-export function Hero({ currentDay, total, totalRevenueCents, streak }: HeroProps) {
+export function Hero({
+  title,
+  subtitle,
+  currentDay,
+  total,
+  totalRevenueCents,
+  streak,
+  statusLabel,
+  mrrLabel,
+  primaryCta,
+  secondaryCta,
+}: HeroProps) {
+  const titleLines = title.split("\n");
   return (
     <section style={{ padding: "56px 0 36px", borderBottom: "2px solid var(--border)" }}>
       <h1
@@ -22,10 +40,12 @@ export function Hero({ currentDay, total, totalRevenueCents, streak }: HeroProps
           margin: "0 0 20px",
         }}
       >
-        67 Projects.
-        <br />
-        Built with AI.
-        <Cursor char="█" />
+        {titleLines.map((line, i) => (
+          <span key={i} style={{ display: "block" }}>
+            {line}
+            {i === titleLines.length - 1 && <Cursor char="█" />}
+          </span>
+        ))}
       </h1>
       <div
         style={{
@@ -42,10 +62,16 @@ export function Hero({ currentDay, total, totalRevenueCents, streak }: HeroProps
           {currentDay}/{total} shipped
         </span>
       </div>
-      <p style={{ fontSize: 16, lineHeight: 1.65, maxWidth: 640, margin: "0 0 24px" }}>
-        One solo founder. Zero lines of code typed.
-        <br />
-        67 micro-products for developers and creators. One at a time. No subscriptions.
+      <p
+        style={{
+          fontSize: 16,
+          lineHeight: 1.65,
+          maxWidth: 640,
+          margin: "0 0 24px",
+          whiteSpace: "pre-line",
+        }}
+      >
+        {subtitle}
       </p>
       <div
         style={{
@@ -60,13 +86,13 @@ export function Hero({ currentDay, total, totalRevenueCents, streak }: HeroProps
         }}
       >
         <div>
-          <span style={{ color: "var(--dim)" }}># status:</span> shipping daily
+          <span style={{ color: "var(--dim)" }}># status:</span> {statusLabel}
         </div>
         <div>
           <span style={{ color: "var(--dim)" }}># streak:</span> {streak} days
         </div>
         <div>
-          <span style={{ color: "var(--dim)" }}># mrr:</span> $0 (one-time only)
+          <span style={{ color: "var(--dim)" }}># mrr:</span> {mrrLabel}
         </div>
         <div>
           <span style={{ color: "var(--dim)" }}># total-revenue:</span> $
@@ -74,11 +100,11 @@ export function Hero({ currentDay, total, totalRevenueCents, streak }: HeroProps
         </div>
       </div>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <Link href="/projects" className="btn-brutal btn-primary">
-          &gt; BROWSE ALL PROJECTS
+        <Link href={primaryCta.href} className="btn-brutal btn-primary">
+          {primaryCta.label}
         </Link>
-        <Link href="/log" className="btn-brutal btn-ghost">
-          &gt; READ THE LOG
+        <Link href={secondaryCta.href} className="btn-brutal btn-ghost">
+          {secondaryCta.label}
         </Link>
       </div>
     </section>

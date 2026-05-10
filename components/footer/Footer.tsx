@@ -1,4 +1,25 @@
-export function Footer() {
+export interface FooterLink { label: string; href: string; }
+export interface FooterProps {
+  cwd?: string;
+  links?: FooterLink[];
+  copyright?: string;
+  buildTime?: string;
+}
+
+const DEFAULT_LINKS: FooterLink[] = [
+  { label: "github.com/bartek-filipiuk", href: "https://github.com/bartek-filipiuk" },
+  { label: "x.com/bartek67", href: "https://x.com/bartek67" },
+  { label: "rss.xml", href: "/rss.xml" },
+];
+
+export function Footer({
+  cwd = "/home/bartek/67projects",
+  links = DEFAULT_LINKS,
+  copyright = "© MMXXVI bartek",
+  buildTime,
+}: FooterProps) {
+  // buildTime is provided by RSC parent (server-rendered once per route revalidate),
+  // never rendered from `new Date()` at request time → no hydration mismatch.
   return (
     <footer style={{ marginTop: 60 }}>
       <div style={{ borderTop: "2px solid var(--border)" }} />
@@ -12,19 +33,20 @@ export function Footer() {
           gap: 12,
         }}
       >
-        <div>/home/bartek/67projects</div>
+        <div>{cwd}</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <a href="https://github.com/bartek-filipiuk" rel="me noopener" style={{ padding: "2px 6px" }}>
-            github.com/bartek-filipiuk
-          </a>
-          <span style={{ color: "var(--dim)" }}>|</span>
-          <a href="https://x.com/bartek67" rel="me noopener" style={{ padding: "2px 6px" }}>
-            x.com/bartek67
-          </a>
-          <span style={{ color: "var(--dim)" }}>|</span>
-          <a href="/rss.xml" style={{ padding: "2px 6px" }}>
-            rss.xml
-          </a>
+          {links.map((l, i) => (
+            <span key={l.href} style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+              <a
+                href={l.href}
+                rel={l.href.startsWith("http") ? "me noopener" : undefined}
+                style={{ padding: "2px 6px" }}
+              >
+                {l.label}
+              </a>
+              {i < links.length - 1 && <span style={{ color: "var(--dim)" }}>|</span>}
+            </span>
+          ))}
         </div>
       </div>
       <div
@@ -38,8 +60,8 @@ export function Footer() {
           flexWrap: "wrap",
         }}
       >
-        <span># last build: {new Date().toISOString().slice(0, 19).replace("T", " ")} UTC</span>
-        <span># © MMXXVI bartek</span>
+        {buildTime && <span># last build: {buildTime} UTC</span>}
+        <span># {copyright}</span>
       </div>
     </footer>
   );

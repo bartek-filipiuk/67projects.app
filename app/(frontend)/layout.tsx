@@ -3,14 +3,23 @@ import "../globals.css";
 import { jetbrainsMono } from "@/styles/fonts";
 import { Nav } from "@/components/nav/Nav";
 import { Footer } from "@/components/footer/Footer";
+import { getSiteSettings } from "@/lib/site-settings";
 
-export const metadata: Metadata = {
-  title: "67 Projects · bartek@67projects:~$",
-  description: "67 micro-products in 67 days. Built with AI. One solo founder.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3000"),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const s = await getSiteSettings();
+  return {
+    title: s.metaTitle,
+    description: s.metaDescription,
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3000"),
+  };
+}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Stable build timestamp captured at module load (build time / cold start),
+// not request time → no hydration mismatch.
+const BUILD_TIME = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const s = await getSiteSettings();
   return (
     <html lang="en" className={jetbrainsMono.variable}>
       <body>
@@ -34,12 +43,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               color: "var(--dim)",
             }}
           >
-            <span>Loading 67projects.app v0.1.0…</span>
-            <span>OK.</span>
+            <span>{s.bootText}</span>
           </div>
-          <Nav />
+          <Nav siteName={s.siteName} />
           {children}
-          <Footer />
+          <Footer
+            cwd={s.footerCwd}
+            links={s.footerLinks}
+            copyright={s.footerCopyright}
+            buildTime={BUILD_TIME}
+          />
         </div>
       </body>
     </html>

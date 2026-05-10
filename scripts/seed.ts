@@ -48,7 +48,8 @@ const LOGS = [
 async function upsert(payload: Awaited<ReturnType<typeof getPayload>>, collection: string, where: Record<string, unknown>, data: Record<string, unknown>) {
   const found = await payload.find({ collection: collection as never, where: where as never, limit: 1 });
   if (found.totalDocs > 0) {
-    return payload.update({ collection: collection as never, id: found.docs[0]!.id as never, data: data as never });
+    const id = (found.docs[0] as unknown as { id: string | number }).id;
+    return payload.update({ collection: collection as never, id: id as never, data: data as never });
   }
   return payload.create({ collection: collection as never, data: data as never });
 }
@@ -86,7 +87,45 @@ async function main() {
 
   await payload.updateGlobal({
     slug: "siteSettings",
-    data: { totalRevenueCents: 428742, currentDay: 14, streakDays: 14, liveRevenueLog: true },
+    data: {
+      totalRevenueCents: 428742,
+      currentDay: 14,
+      streakDays: 14,
+      liveRevenueLog: true,
+      siteName: "bartek@67projects",
+      metaTitle: "67 Projects · bartek@67projects:~$",
+      metaDescription: "67 micro-products in 67 days. Built with AI. One solo founder.",
+      bootText: "Loading 67projects.app v0.1.0… OK.",
+      heroTitle: "67 Projects.\nBuilt with AI.",
+      heroSubtitle:
+        "One solo founder. Zero lines of code typed.\n67 micro-products for developers and creators. One at a time. No subscriptions.",
+      heroStatusLabel: "shipping daily",
+      heroMrrLabel: "$0 (one-time only)",
+      heroPrimaryCta: { label: "> BROWSE ALL PROJECTS", href: "/projects" },
+      heroSecondaryCta: { label: "> READ THE LOG", href: "/log" },
+      cmdLatestReleases: "ls -la ./latest-releases",
+      cmdOpenSource: "cat ./open-source.md",
+      cmdRevenueLog: "tail -f ./revenue.log",
+      cmdChallenge: "cat ./67-days-of-ai-magic.txt",
+      challengeCopy:
+        "Every day, one new product. Every day, one silent-coding video. For 67 days. The whole thing is a public bet that one solo founder + Claude Code can outship a five-person seed-stage team.",
+      nextShipText: "tomorrow 09:00 UTC",
+      footerCwd: "/home/bartek/67projects",
+      footerCopyright: "© MMXXVI bartek",
+      footerLinks: [
+        { label: "github.com/bartek-filipiuk", href: "https://github.com/bartek-filipiuk" },
+        { label: "x.com/bartek67", href: "https://x.com/bartek67" },
+        { label: "rss.xml", href: "/rss.xml" },
+      ],
+      contactFields: [
+        { key: "[email]", value: "bartek@67projects.app" },
+        { key: "[twitter]", value: "@bartek67" },
+        { key: "[github]", value: "bartek-filipiuk" },
+        { key: "[linkedin]", value: "in/bartek67" },
+        { key: "[response_sla]", value: "< 24h on weekdays" },
+        { key: "[location]", value: "Warsaw, PL — UTC+1" },
+      ],
+    },
   });
 
   console.log("✓ seed complete");

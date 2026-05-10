@@ -7,13 +7,15 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { RepoCard } from "@/components/repo/RepoCard";
 import { CmdHeader } from "@/components/primitives/CmdHeader";
 import { RECENT_SEED } from "@/lib/revenue-stream";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
   const payload = await getPayload({ config });
+  const s = await getSiteSettings();
 
-  const [latestProjects, repos, settings] = await Promise.all([
+  const [latestProjects, repos] = await Promise.all([
     payload.find({
       collection: "projects",
       where: { status: { equals: "published" } },
@@ -26,20 +28,25 @@ export default async function HomePage() {
       sort: "-starsCached",
       limit: 3,
     }),
-    payload.findGlobal({ slug: "siteSettings" }),
   ]);
 
   return (
     <main style={{ padding: "0 0 80px" }}>
       <Hero
-        currentDay={settings.currentDay ?? 14}
+        title={s.heroTitle}
+        subtitle={s.heroSubtitle}
+        currentDay={s.currentDay}
         total={67}
-        totalRevenueCents={settings.totalRevenueCents ?? 0}
-        streak={settings.streakDays ?? 14}
+        totalRevenueCents={s.totalRevenueCents}
+        streak={s.streakDays}
+        statusLabel={s.heroStatusLabel}
+        mrrLabel={s.heroMrrLabel}
+        primaryCta={s.heroPrimaryCta}
+        secondaryCta={s.heroSecondaryCta}
       />
 
       <section style={{ padding: "56px 0 8px" }}>
-        <CmdHeader cmd="ls -la ./latest-releases" />
+        <CmdHeader cmd={s.cmdLatestReleases} />
         <div className="grid-3" style={{ marginTop: 24 }}>
           {latestProjects.docs.map((p) => (
             <ProductCard
@@ -59,7 +66,7 @@ export default async function HomePage() {
       </section>
 
       <section style={{ padding: "56px 0 8px" }}>
-        <CmdHeader cmd="cat ./open-source.md" />
+        <CmdHeader cmd={s.cmdOpenSource} />
         <div className="grid-3" style={{ marginTop: 24 }}>
           {repos.docs.map((r) => (
             <RepoCard
@@ -77,9 +84,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {settings.liveRevenueLog && <RevenueLogStream initial={RECENT_SEED} />}
+      {s.liveRevenueLog && (
+        <RevenueLogStream initial={RECENT_SEED} cmd={s.cmdRevenueLog} />
+      )}
 
-      <ChallengeGrid doneDays={settings.currentDay ?? 14} />
+      <ChallengeGrid
+        doneDays={s.currentDay}
+        cmd={s.cmdChallenge}
+        copy={s.challengeCopy}
+        nextShipText={s.nextShipText}
+      />
     </main>
   );
 }

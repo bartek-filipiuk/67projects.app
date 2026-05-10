@@ -6,7 +6,7 @@ import { type Sale, formatSaleLine } from "@/lib/revenue-stream";
 
 const MAX_LINES = 20;
 
-export function RevenueLogStream({ initial }: { initial: Sale[] }) {
+export function RevenueLogStream({ initial, cmd = "tail -f ./revenue.log" }: { initial: Sale[]; cmd?: string }) {
   const [lines, setLines] = useState<Sale[]>(initial);
   const [now, setNow] = useState<string | null>(null);
 
@@ -32,7 +32,7 @@ export function RevenueLogStream({ initial }: { initial: Sale[] }) {
 
   return (
     <section style={{ padding: "56px 0 8px" }}>
-      <CmdHeader cmd="tail -f ./revenue.log" />
+      <CmdHeader cmd={cmd} />
       <div
         style={{
           fontSize: 12,

@@ -1,10 +1,24 @@
 import { CmdHeader } from "../primitives/CmdHeader";
 
-export function ChallengeGrid({ doneDays, total = 67 }: { doneDays: number; total?: number }) {
+interface ChallengeGridProps {
+  doneDays: number;
+  total?: number;
+  cmd: string;
+  copy: string;
+  nextShipText: string;
+}
+
+export function ChallengeGrid({
+  doneDays,
+  total = 67,
+  cmd,
+  copy,
+  nextShipText,
+}: ChallengeGridProps) {
   const remaining = total - doneDays;
   return (
     <section style={{ padding: "56px 0 8px" }}>
-      <CmdHeader cmd="cat ./67-days-of-ai-magic.txt" />
+      <CmdHeader cmd={cmd} />
       <div
         style={{
           border: "2px solid var(--border)",
@@ -16,7 +30,7 @@ export function ChallengeGrid({ doneDays, total = 67 }: { doneDays: number; tota
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: `repeat(${total}, 1fr)`,
+            gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))`,
             gap: 4,
             marginBottom: 18,
           }}
@@ -35,6 +49,7 @@ export function ChallengeGrid({ doneDays, total = 67 }: { doneDays: number; tota
                   fontSize: 12,
                   color: done ? "#fff" : "var(--dim)",
                   background: done ? "var(--accent)" : "transparent",
+                  minWidth: 0,
                 }}
               >
                 {done ? "■" : "·"}
@@ -61,14 +76,10 @@ export function ChallengeGrid({ doneDays, total = 67 }: { doneDays: number; tota
             <span style={{ color: "var(--dim)" }}>REMAINING</span> {remaining} days
           </div>
           <div>
-            <span style={{ color: "var(--dim)" }}>NEXT_SHIP</span> tomorrow 09:00 UTC
+            <span style={{ color: "var(--dim)" }}>NEXT_SHIP</span> {nextShipText}
           </div>
         </div>
-        <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 720, margin: 0 }}>
-          Every day, one new product. Every day, one silent-coding video. For 67 days. The whole
-          thing is a public bet that one solo founder + Claude Code can outship a five-person
-          seed-stage team.
-        </p>
+        <p style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 720, margin: 0 }}>{copy}</p>
       </div>
     </section>
   );

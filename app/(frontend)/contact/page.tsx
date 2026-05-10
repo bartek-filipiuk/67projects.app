@@ -1,15 +1,10 @@
 import { CmdHeader } from "@/components/primitives/CmdHeader";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { getSiteSettings } from "@/lib/site-settings";
 
-export default function ContactPage() {
-  const fields: Array<[string, string]> = [
-    ["[email]", "bartek@67projects.app"],
-    ["[twitter]", "@bartek67"],
-    ["[github]", "bartek-filipiuk"],
-    ["[linkedin]", "in/bartek67"],
-    ["[response_sla]", "< 24h on weekdays"],
-    ["[location]", "Warsaw, PL — UTC+1"],
-  ];
+export default async function ContactPage() {
+  const s = await getSiteSettings();
+  const fields = s.contactFields ?? [];
   return (
     <main style={{ padding: "0 0 80px" }}>
       <section style={{ padding: "56px 0 8px" }}>
@@ -22,17 +17,17 @@ export default function ContactPage() {
             margin: "12px 0 24px",
           }}
         >
-          {fields.map(([k, v]) => (
+          {fields.map(({ key, value }) => (
             <div
-              key={k}
+              key={key}
               style={{
                 padding: "16px 18px",
                 borderRight: "1px dashed var(--border)",
                 borderBottom: "1px dashed var(--border)",
               }}
             >
-              <div style={{ fontSize: 11, color: "var(--dim)", marginBottom: 4 }}>{k}</div>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>{v}</div>
+              <div style={{ fontSize: 11, color: "var(--dim)", marginBottom: 4 }}>{key}</div>
+              <div style={{ fontSize: 16, fontWeight: 700 }}>{value}</div>
             </div>
           ))}
         </div>

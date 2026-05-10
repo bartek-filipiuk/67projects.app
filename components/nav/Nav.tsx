@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { Cursor } from "../primitives/Cursor";
 import { NavLink } from "./NavLink";
 
-export function Nav() {
+export function Nav({ siteName = "bartek@67projects" }: { siteName?: string }) {
   return (
     <nav
       style={{
@@ -15,13 +16,23 @@ export function Nav() {
         gap: 12,
       }}
     >
-      <div style={{ display: "inline-flex", alignItems: "center", fontWeight: 600 }}>
-        <span>bartek@67projects</span>
+      <Link
+        href="/"
+        aria-label="home"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          fontWeight: 700,
+          fontSize: 16,
+          letterSpacing: "-0.005em",
+        }}
+      >
+        <span>{siteName}</span>
         <span style={{ color: "var(--accent)" }}>:</span>
         <span style={{ color: "var(--accent)" }}>~</span>
         <span>$</span>
         <Cursor char="_" />
-      </div>
+      </Link>
       <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
         <NavLink href="/projects">/projects</NavLink>
         <NavLink href="/open-source">/open-source</NavLink>
