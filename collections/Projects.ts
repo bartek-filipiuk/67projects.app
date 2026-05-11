@@ -1,8 +1,21 @@
 import type { CollectionConfig } from "payload";
+import { revalidatePaths } from "../lib/revalidate";
 
 export const Projects: CollectionConfig = {
   slug: "projects",
   admin: { useAsTitle: "name", defaultColumns: ["name", "day", "status", "priceCents"] },
+  hooks: {
+    afterChange: [
+      ({ doc }) => {
+        revalidatePaths("/", "/projects", `/projects/${doc.slug}`);
+      },
+    ],
+    afterDelete: [
+      ({ doc }) => {
+        revalidatePaths("/", "/projects", `/projects/${doc.slug}`);
+      },
+    ],
+  },
   access: {
     read: ({ req }) => {
       if (req.user?.role === "admin") return true;

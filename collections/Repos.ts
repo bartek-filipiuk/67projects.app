@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidatePaths } from "../lib/revalidate";
 
 export const Repos: CollectionConfig = {
   slug: "repos",
@@ -33,5 +34,7 @@ export const Repos: CollectionConfig = {
         return data;
       },
     ],
+    afterChange: [() => revalidatePaths("/", "/open-source")],
+    afterDelete: [() => revalidatePaths("/", "/open-source")],
   },
 };

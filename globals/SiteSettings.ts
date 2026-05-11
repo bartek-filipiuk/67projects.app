@@ -1,10 +1,19 @@
 import type { GlobalConfig } from "payload";
+import { revalidatePaths } from "../lib/revalidate";
 
 export const SiteSettings: GlobalConfig = {
   slug: "siteSettings",
   access: {
     read: () => true,
     update: ({ req }) => req.user?.role === "admin",
+  },
+  hooks: {
+    afterChange: [
+      () => {
+        // SiteSettings affects every page (layout fetches it for Nav/Footer/meta).
+        revalidatePaths("/", "/projects", "/open-source", "/log", "/contact");
+      },
+    ],
   },
   fields: [
     {

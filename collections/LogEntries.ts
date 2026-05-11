@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidatePaths } from "../lib/revalidate";
 
 export const LogEntries: CollectionConfig = {
   slug: "logEntries",
@@ -32,6 +33,12 @@ export const LogEntries: CollectionConfig = {
         }
         return data;
       },
+    ],
+    afterChange: [
+      ({ doc }) => revalidatePaths("/log", `/log/${doc.slug}`),
+    ],
+    afterDelete: [
+      ({ doc }) => revalidatePaths("/log", `/log/${doc.slug}`),
     ],
   },
 };
