@@ -4,13 +4,25 @@ export function middleware(req: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";
 
+  // Self-hosted Umami tracker origin. Falls back to "" so the value
+  // disappears from CSP when analytics is not configured.
+  const umamiOrigin = (() => {
+    const src = process.env.NEXT_PUBLIC_UMAMI_SRC;
+    if (!src) return "";
+    try {
+      return new URL(src).origin;
+    } catch {
+      return "";
+    }
+  })();
+
   const csp = [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${umamiOrigin ? ` ${umamiOrigin}` : ""}${isDev ? " 'unsafe-eval'" : ""}`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob:`,
     `font-src 'self'`,
-    `connect-src 'self' https://api.github.com${isDev ? " ws://localhost:* http://localhost:*" : ""}`,
+    `connect-src 'self' https://api.github.com${umamiOrigin ? ` ${umamiOrigin}` : ""}${isDev ? " ws://localhost:* http://localhost:*" : ""}`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,

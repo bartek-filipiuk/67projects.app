@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import Script from "next/script";
+import { headers } from "next/headers";
 import "../globals.css";
 import { jetbrainsMono } from "@/styles/fonts";
 import { Nav } from "@/components/nav/Nav";
 import { Footer } from "@/components/footer/Footer";
 import { getSiteSettings } from "@/lib/site-settings";
+import { env } from "@/lib/env";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSiteSettings();
@@ -20,9 +23,21 @@ const BUILD_TIME = new Date().toISOString().slice(0, 19).replace("T", " ");
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const s = await getSiteSettings();
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const umamiEnabled =
+    env.NODE_ENV === "production" && !!env.NEXT_PUBLIC_UMAMI_SRC && !!env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
   return (
     <html lang="en" className={jetbrainsMono.variable}>
       <body>
+        {umamiEnabled && (
+          <Script
+            src={env.NEXT_PUBLIC_UMAMI_SRC!}
+            data-website-id={env.NEXT_PUBLIC_UMAMI_WEBSITE_ID!}
+            data-do-not-track="true"
+            strategy="afterInteractive"
+            nonce={nonce}
+          />
+        )}
         <div
           style={{
             minHeight: "100vh",

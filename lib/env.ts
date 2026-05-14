@@ -11,6 +11,8 @@ const schema = z.object({
     .string()
     .transform((v) => v === "1" || v.toLowerCase() === "true")
     .default("0"),
+  NEXT_PUBLIC_UMAMI_SRC: z.string().url().optional(),
+  NEXT_PUBLIC_UMAMI_WEBSITE_ID: z.string().uuid().optional(),
 });
 
 const parsed = schema.safeParse(process.env);

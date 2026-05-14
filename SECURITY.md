@@ -43,10 +43,18 @@
 
 ### GDPR
 - Self-hosted fonts (no Google Fonts CDN)
-- No third-party analytics in MVP
+- Self-hosted Umami analytics (no third-party analytics provider) — see `Analytics` below
 - IP hashing (SHA-256 with daily-rotating salt) — irreversible
 - All data EU-resident (Hetzner Falkenstein when deployed)
 - Right-to-delete: admin can purge ContactSubmissions
+
+### Analytics
+- Self-hosted Umami at `https://stats.67projects.app` (separate Coolify Service in the same project)
+- No cookies, no cross-site tracking, no fingerprinting
+- DNT (`data-do-not-track="true"`) respected by the tracker
+- Tracker script renamed via `TRACKER_SCRIPT_NAME=ascii.js` (bypasses default-path adblock rules; first-party domain → harder to block)
+- Script gated in `app/(frontend)/layout.tsx` — only loaded when `NODE_ENV=production` AND `NEXT_PUBLIC_UMAMI_SRC` + `NEXT_PUBLIC_UMAMI_WEBSITE_ID` are set, so dev/preview traffic never reaches the dashboard
+- CSP `script-src` and `connect-src` extended to include the Umami origin (derived from `NEXT_PUBLIC_UMAMI_SRC` in `middleware.ts`); if the env var is unset, the origin disappears from CSP entirely
 
 ### Media uploads
 - Admin-only (auth gated)
