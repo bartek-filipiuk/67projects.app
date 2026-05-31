@@ -5,10 +5,9 @@ import { AsciiProgressBar } from "../primitives/AsciiProgressBar";
 interface HeroProps {
   title: string;
   subtitle: string;
-  currentDay: number;
+  shipped: number;
   total: number;
   totalRevenueCents: number;
-  streak: number;
   statusLabel: string;
   mrrLabel: string;
   primaryCta: { label: string; href: string };
@@ -18,10 +17,9 @@ interface HeroProps {
 export function Hero({
   title,
   subtitle,
-  currentDay,
+  shipped,
   total,
   totalRevenueCents,
-  streak,
   statusLabel,
   mrrLabel,
   primaryCta,
@@ -57,9 +55,9 @@ export function Hero({
           fontWeight: 600,
         }}
       >
-        <AsciiProgressBar filled={currentDay} total={total} width={22} />
+        <AsciiProgressBar filled={shipped} total={total} width={22} />
         <span style={{ fontWeight: 500 }}>
-          {currentDay}/{total} shipped
+          {shipped}/{total} shipped
         </span>
       </div>
       <p
@@ -89,7 +87,7 @@ export function Hero({
           <span style={{ color: "var(--dim)" }}># status:</span> {statusLabel}
         </div>
         <div>
-          <span style={{ color: "var(--dim)" }}># streak:</span> {streak} days
+          <span style={{ color: "var(--dim)" }}># shipped:</span> {shipped}/{total}
         </div>
         <div>
           <span style={{ color: "var(--dim)" }}># mrr:</span> {mrrLabel}

@@ -11,6 +11,8 @@ import { getSiteSettings } from "@/lib/site-settings";
 
 export const revalidate = 300;
 
+const TOTAL_PROJECTS = 67;
+
 export default async function HomePage() {
   const s = await getSiteSettings();
 
@@ -35,6 +37,8 @@ export default async function HomePage() {
 
   let latestProjects: { docs: ProjectDoc[] } = { docs: [] };
   let repos: { docs: RepoDoc[] } = { docs: [] };
+  // Number of shipped (published) projects — drives the "X / 67 shipped" counter.
+  let shippedCount = 0;
   try {
     const payload = await getPayload({ config });
     const [pj, rp] = await Promise.all([
@@ -53,6 +57,8 @@ export default async function HomePage() {
     ]);
     latestProjects = { docs: pj.docs as unknown as ProjectDoc[] };
     repos = { docs: rp.docs as unknown as RepoDoc[] };
+    // totalDocs is the full count of matching docs, independent of `limit`.
+    shippedCount = pj.totalDocs;
   } catch {
     /* DB unavailable during build — render empty; ISR will re-query at runtime */
   }
@@ -62,10 +68,9 @@ export default async function HomePage() {
       <Hero
         title={s.heroTitle}
         subtitle={s.heroSubtitle}
-        currentDay={s.currentDay}
-        total={67}
+        shipped={shippedCount}
+        total={TOTAL_PROJECTS}
         totalRevenueCents={s.totalRevenueCents}
-        streak={s.streakDays}
         statusLabel={s.heroStatusLabel}
         mrrLabel={s.heroMrrLabel}
         primaryCta={s.heroPrimaryCta}
@@ -116,7 +121,8 @@ export default async function HomePage() {
       )}
 
       <ChallengeGrid
-        doneDays={s.currentDay}
+        shipped={shippedCount}
+        total={TOTAL_PROJECTS}
         cmd={s.cmdChallenge}
         copy={s.challengeCopy}
         nextShipText={s.nextShipText}

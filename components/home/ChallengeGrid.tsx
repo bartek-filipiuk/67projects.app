@@ -1,7 +1,7 @@
 import { CmdHeader } from "../primitives/CmdHeader";
 
 interface ChallengeGridProps {
-  doneDays: number;
+  shipped: number;
   total?: number;
   cmd: string;
   copy: string;
@@ -9,13 +9,13 @@ interface ChallengeGridProps {
 }
 
 export function ChallengeGrid({
-  doneDays,
+  shipped,
   total = 67,
   cmd,
   copy,
   nextShipText,
 }: ChallengeGridProps) {
-  const remaining = total - doneDays;
+  const remaining = Math.max(0, total - shipped);
   return (
     <section style={{ padding: "56px 0 8px" }}>
       <CmdHeader cmd={cmd} />
@@ -36,7 +36,7 @@ export function ChallengeGrid({
           }}
         >
           {Array.from({ length: total }, (_, i) => {
-            const done = i < doneDays;
+            const done = i < shipped;
             return (
               <div
                 key={i}
@@ -70,10 +70,10 @@ export function ChallengeGrid({
           }}
         >
           <div>
-            <span style={{ color: "var(--dim)" }}>DAY</span> {doneDays} / {total}
+            <span style={{ color: "var(--dim)" }}>SHIPPED</span> {shipped} / {total}
           </div>
           <div>
-            <span style={{ color: "var(--dim)" }}>REMAINING</span> {remaining} days
+            <span style={{ color: "var(--dim)" }}>REMAINING</span> {remaining} projects
           </div>
           <div>
             <span style={{ color: "var(--dim)" }}>NEXT_SHIP</span> {nextShipText}

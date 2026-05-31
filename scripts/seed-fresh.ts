@@ -3,10 +3,13 @@
  * Inserts the 3 base categories and ensures SiteSettings has the launch state.
  * Does NOT insert demo projects/repos/log entries — those are added by Bartek via admin.
  *
- * Safe to run on every container start.
+ * Safe to run on every container start: categories are created only if missing,
+ * and SiteSettings is written only on the very first run (before the global is
+ * ever persisted) so that redeploys never overwrite admin edits.
  */
 import { getPayload } from "payload";
 import config from "../payload.config";
+import { shouldInitializeSiteSettings } from "../lib/seed-guard";
 
 const CATEGORIES = [
   { name: "Boilerplates", slug: "boilerplates", sortOrder: 1 },
@@ -24,14 +27,14 @@ const FRESH_SITE_SETTINGS = {
   // Branding — defaults aligned with collection schema defaults
   siteName: "bartek@67projects",
   metaTitle: "67 Projects · bartek@67projects:~$",
-  metaDescription: "67 micro-products in 67 days. Built with AI. One solo founder.",
+  metaDescription: "67 micro-products. Built with AI. One solo founder.",
   bootText: "Loading 67projects.app v0.1.0… OK.",
 
   // Hero
   heroTitle: "67 Projects.\nBuilt with AI.",
   heroSubtitle:
     "One solo founder. Zero lines of code typed.\n67 micro-products for developers and creators. One at a time. No subscriptions.",
-  heroStatusLabel: "shipping daily",
+  heroStatusLabel: "shipping",
   heroMrrLabel: "$0 (one-time only)",
   heroPrimaryCta: { label: "> BROWSE ALL PROJECTS", href: "/projects" },
   heroSecondaryCta: { label: "> READ THE LOG", href: "/log" },
@@ -40,10 +43,10 @@ const FRESH_SITE_SETTINGS = {
   cmdLatestReleases: "ls -la ./latest-releases",
   cmdOpenSource: "cat ./open-source.md",
   cmdRevenueLog: "tail -f ./revenue.log",
-  cmdChallenge: "cat ./67-days-of-ai-magic.txt",
+  cmdChallenge: "cat ./the-67-bet.txt",
   challengeCopy:
-    "Every day, one new product. Every day, one silent-coding video. For 67 days. The whole thing is a public bet that one solo founder + Claude Code can outship a five-person seed-stage team.",
-  nextShipText: "TBA",
+    "One product at a time. One silent-coding video per build. 67 products total — a public bet that one solo founder + Claude Code can outship a five-person seed-stage team.",
+  nextShipText: "when it's ready",
 
   // Footer
   footerCwd: "/home/bartek/67projects",
@@ -65,43 +68,30 @@ const FRESH_SITE_SETTINGS = {
   ],
 };
 
-async function upsert(
-  payload: Awaited<ReturnType<typeof getPayload>>,
-  collection: string,
-  where: Record<string, unknown>,
-  data: Record<string, unknown>,
-) {
-  const found = await payload.find({ collection: collection as never, where: where as never, limit: 1 });
-  if (found.totalDocs > 0) {
-    const id = (found.docs[0] as unknown as { id: string | number }).id;
-    return payload.update({ collection: collection as never, id: id as never, data: data as never });
-  }
-  return payload.create({ collection: collection as never, data: data as never });
-}
-
 async function main() {
   const payload = await getPayload({ config });
 
+  // Categories: create only if missing. Never update an existing one — the admin
+  // may have renamed it, and a redeploy must not revert that.
   for (const c of CATEGORIES) {
-    await upsert(payload, "categories", { slug: { equals: c.slug } }, c);
+    const found = await payload.find({
+      collection: "categories",
+      where: { slug: { equals: c.slug } },
+      limit: 1,
+    });
+    if (found.totalDocs === 0) {
+      await payload.create({ collection: "categories", data: c });
+    }
   }
 
-  // SiteSettings: only update fields if global is fresh (no totalRevenueCents > 0).
-  // Once Bartek has real data, we don't want a redeploy to wipe it.
-  const current = (await payload.findGlobal({ slug: "siteSettings" })) as {
-    totalRevenueCents?: number;
-    siteName?: string;
-  };
-  const isFresh =
-    !current ||
-    (current.totalRevenueCents ?? 0) === 0 ||
-    !current.siteName;
-
-  if (isFresh) {
+  // SiteSettings: write defaults ONLY on first run (global never persisted).
+  // Once persisted (by this seed or by an admin edit), leave it untouched.
+  const current = await payload.findGlobal({ slug: "siteSettings" });
+  if (shouldInitializeSiteSettings(current)) {
     await payload.updateGlobal({ slug: "siteSettings", data: FRESH_SITE_SETTINGS });
-    console.log("✓ seed-fresh: 3 categories + clean SiteSettings");
+    console.log("✓ seed-fresh: categories ensured; SiteSettings initialized (first run)");
   } else {
-    console.log("✓ seed-fresh: categories ensured; SiteSettings preserved (already populated)");
+    console.log("✓ seed-fresh: categories ensured; SiteSettings preserved (admin-owned)");
   }
 }
 
