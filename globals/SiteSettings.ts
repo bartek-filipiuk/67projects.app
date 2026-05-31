@@ -48,7 +48,7 @@ export const SiteSettings: GlobalConfig = {
               name: "metaDescription",
               type: "textarea",
               defaultValue:
-                "67 micro-products in 67 days. Built with AI. One solo founder.",
+                "67 micro-products. Built with AI. One solo founder.",
             },
             {
               name: "bootText",
@@ -77,7 +77,7 @@ export const SiteSettings: GlobalConfig = {
             {
               name: "heroStatusLabel",
               type: "text",
-              defaultValue: "shipping daily",
+              defaultValue: "shipping",
               admin: { description: "Value of `# status:` in hero meta row." },
             },
             {
@@ -109,14 +109,14 @@ export const SiteSettings: GlobalConfig = {
             { name: "cmdLatestReleases", type: "text", defaultValue: "ls -la ./latest-releases" },
             { name: "cmdOpenSource", type: "text", defaultValue: "cat ./open-source.md" },
             { name: "cmdRevenueLog", type: "text", defaultValue: "tail -f ./revenue.log" },
-            { name: "cmdChallenge", type: "text", defaultValue: "cat ./67-days-of-ai-magic.txt" },
+            { name: "cmdChallenge", type: "text", defaultValue: "cat ./the-67-bet.txt" },
             {
               name: "challengeCopy",
               type: "textarea",
               defaultValue:
-                "Every day, one new product. Every day, one silent-coding video. For 67 days. The whole thing is a public bet that one solo founder + Claude Code can outship a five-person seed-stage team.",
+                "One product at a time. One silent-coding video per build. 67 products total — a public bet that one solo founder + Claude Code can outship a five-person seed-stage team.",
             },
-            { name: "nextShipText", type: "text", defaultValue: "tomorrow 09:00 UTC" },
+            { name: "nextShipText", type: "text", defaultValue: "when it's ready" },
           ],
         },
         {
