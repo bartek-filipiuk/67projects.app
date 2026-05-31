@@ -102,6 +102,9 @@ describe("buildProjectPayload", () => {
   it("rejects a slug that is not kebab-case", () => {
     expect(() => buildProjectPayload({ ...baseProject, slug: "Bad Slug" }, 7)).toThrow(/slug/);
   });
+  it("rejects a name that produces an empty slug", () => {
+    expect(() => buildProjectPayload({ ...baseProject, name: "!!! ???" }, 7)).toThrow(/derive a slug/);
+  });
 });
 
 const baseRepo: RepoInput = {

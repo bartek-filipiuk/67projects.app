@@ -95,6 +95,7 @@ export type ProjectInput = {
   tree?: string;
   priceCents: number;
   currency?: Currency;
+  /** Resolved to a category ID by the CLI; not used by buildProjectPayload. */
   categorySlug: string;
   day: number;
   shipped: string;
@@ -125,6 +126,7 @@ export function buildProjectPayload(input: ProjectInput, categoryId: number | st
   if (name.length > 120) throw new Error("name exceeds 120 chars");
 
   const slug = input.slug?.trim() || slugify(name);
+  if (!slug) throw new Error(`Could not derive a slug from name "${name}" — provide an explicit slug`);
   if (!SLUG_RE.test(slug)) throw new Error(`Invalid slug: "${slug}" (kebab-case only)`);
 
   const description = input.description.trim();
