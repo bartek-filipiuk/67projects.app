@@ -20,6 +20,7 @@
     "seed": "tsx --env-file=.env scripts/seed.ts",
     "seed:fresh": "tsx --env-file=.env scripts/seed-fresh.ts",
     "create-admin": "tsx --env-file=.env scripts/create-admin.ts",
+    "create-draft": "tsx --env-file=.env scripts/create-draft.ts",
     "payload": "payload"
   },
   "dependencies": {
