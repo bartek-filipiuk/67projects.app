@@ -27,3 +27,6 @@ fixed_in: collections/ContactSubmissions.ts:8
 create: ({ req }) => req.payloadAPI === "local",
 ```
 This allows creates ONLY via Payload's Local API (used by `getPayload()` inside the Server Action). Direct REST/GraphQL POSTs are now denied.
+
+## Regression & Re-fix (2026-05-31)
+The fix above was found absent in the working tree during a later code verification — `create: () => true` had returned (reverted or never committed). Re-applied at `collections/ContactSubmissions.ts:11`. Added a regression guard `tests/unit/contact-submissions-access.test.ts` asserting create is allowed only for `payloadAPI === "local"` and denied for REST / GraphQL / absent `payloadAPI`, so this can't silently regress again.
