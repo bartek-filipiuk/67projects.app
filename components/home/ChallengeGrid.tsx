@@ -15,7 +15,7 @@ export function ChallengeGrid({
   copy,
   nextShipText,
 }: ChallengeGridProps) {
-  const remaining = total - shipped;
+  const remaining = Math.max(0, total - shipped);
   return (
     <section style={{ padding: "56px 0 8px" }}>
       <CmdHeader cmd={cmd} />
