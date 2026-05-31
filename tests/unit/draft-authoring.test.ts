@@ -4,7 +4,9 @@ import {
   mapLicense,
   buildLexical,
   buildProjectPayload,
+  buildRepoPayload,
   type ProjectInput,
+  type RepoInput,
 } from "@/lib/draft-authoring";
 
 describe("slugify", () => {
@@ -99,5 +101,35 @@ describe("buildProjectPayload", () => {
   });
   it("rejects a slug that is not kebab-case", () => {
     expect(() => buildProjectPayload({ ...baseProject, slug: "Bad Slug" }, 7)).toThrow(/slug/);
+  });
+});
+
+const baseRepo: RepoInput = {
+  name: "codehelm",
+  owner: "bartek-filipiuk",
+  description: "Local web UI for Claude Code CLI sessions.",
+  lang: "TypeScript",
+  license: "MIT LICENSE",
+  starsCached: 42,
+  starsCachedAt: "2026-05-31T00:00:00.000Z",
+};
+
+describe("buildRepoPayload", () => {
+  it("forces published:false and passes fields through", () => {
+    const r = buildRepoPayload(baseRepo);
+    expect(r.published).toBe(false);
+    expect(r.name).toBe("codehelm");
+    expect(r.license).toBe("MIT LICENSE");
+  });
+  it("rejects description over 300 chars", () => {
+    expect(() => buildRepoPayload({ ...baseRepo, description: "x".repeat(301) })).toThrow(/description/);
+  });
+  it("rejects a negative star count", () => {
+    expect(() => buildRepoPayload({ ...baseRepo, starsCached: -3 })).toThrow(/starsCached/);
+  });
+  it("requires name, owner and lang", () => {
+    expect(() => buildRepoPayload({ ...baseRepo, name: " " })).toThrow(/name/);
+    expect(() => buildRepoPayload({ ...baseRepo, owner: "" })).toThrow(/owner/);
+    expect(() => buildRepoPayload({ ...baseRepo, lang: "" })).toThrow(/lang/);
   });
 });

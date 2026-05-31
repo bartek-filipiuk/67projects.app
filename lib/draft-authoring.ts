@@ -162,3 +162,31 @@ export function buildProjectPayload(input: ProjectInput, categoryId: number | st
 
   return payload;
 }
+
+export type RepoInput = {
+  name: string;
+  owner: string;
+  description: string;
+  lang: string;
+  license: License;
+  starsCached: number;
+  starsCachedAt: string;
+};
+
+export type RepoPayload = RepoInput & { published: false };
+
+/** Validates a RepoInput and produces a draft Repos payload (published:false). */
+export function buildRepoPayload(input: RepoInput): RepoPayload {
+  const name = input.name.trim();
+  const owner = input.owner.trim();
+  const description = input.description.trim();
+  const lang = input.lang.trim();
+  if (!name) throw new Error("repo name is required");
+  if (!owner) throw new Error("repo owner is required");
+  if (!description) throw new Error("repo description is required");
+  if (description.length > 300) throw new Error("repo description exceeds 300 chars");
+  if (!lang) throw new Error("repo lang is required");
+  if (!Number.isInteger(input.starsCached) || input.starsCached < 0)
+    throw new Error("starsCached must be a non-negative integer");
+  return { name, owner, description, lang, license: input.license, starsCached: input.starsCached, starsCachedAt: input.starsCachedAt, published: false };
+}
