@@ -60,7 +60,7 @@ async function login(): Promise<string> {
 async function findExisting(token: string, collection: string, field: string, value: string): Promise<string | number | null> {
   const url = `${API}/api/${collection}?where[${field}][equals]=${encodeURIComponent(value)}&limit=1&depth=0`;
   const res = await fetch(url, { headers: authHeaders(token) });
-  if (!res.ok) return null;
+  if (!res.ok) fail(`Lookup ${collection}.${field} failed: ${res.status} ${await res.text()}`);
   const json = (await res.json()) as { docs?: { id: string | number }[] };
   return json.docs && json.docs.length > 0 ? json.docs[0]!.id : null;
 }
