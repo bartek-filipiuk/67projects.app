@@ -5,7 +5,10 @@ export const ContactSubmissions: CollectionConfig = {
   admin: { useAsTitle: "name", defaultColumns: ["name", "createdAt"] },
   access: {
     read: ({ req }) => req.user?.role === "admin",
-    create: () => true,
+    // auth-001: only Payload's Local API (used inside the rate-limited Server
+    // Action) may create. Public REST/GraphQL POSTs are denied so the
+    // contactLimiter cannot be bypassed and `ipHash` cannot be spoofed.
+    create: ({ req }) => req.payloadAPI === "local",
     update: () => false,
     delete: ({ req }) => req.user?.role === "admin",
   },
