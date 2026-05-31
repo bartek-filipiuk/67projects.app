@@ -80,6 +80,9 @@ export function buildLexical(lines: string[]): LexicalState {
   return { root: { type: "root", format: "", indent: 0, version: 1, direction: "ltr", children } };
 }
 
+// Mirrors the validator in collections/Projects.ts. Adjacent char classes ⇒ linear,
+// no catastrophic backtracking; input is a trusted, length-bounded slug. Accepted.
+// eslint-disable-next-line security/detect-unsafe-regex
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 
 export type ProjectTag = "" | "NEW" | "HOT" | "BESTSELLER";
