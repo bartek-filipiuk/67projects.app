@@ -26,6 +26,11 @@ export const Users: CollectionConfig = {
       type: "select",
       required: true,
       defaultValue: "customer",
+      // Users may update their own document (see access.update), so without
+      // field-level access a customer could PATCH { role: "admin" } on itself.
+      access: {
+        update: ({ req }) => req.user?.role === "admin",
+      },
       options: [
         { label: "Admin", value: "admin" },
         { label: "Customer", value: "customer" },

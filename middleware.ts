@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { MEDIA_CSP, isMediaFilePath } from "./lib/media-csp";
 
 export function middleware(req: NextRequest) {
+  if (isMediaFilePath(req.nextUrl.pathname)) {
+    const res = NextResponse.next();
+    res.headers.set("Content-Security-Policy", MEDIA_CSP);
+    return res;
+  }
+
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";
 
